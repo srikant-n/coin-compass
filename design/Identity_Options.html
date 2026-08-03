@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coin Compass — Identity Options</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+        display: ['"Sora"', 'sans-serif'],
+      },
+      colors: {
+        cream: '#FCF9F2',
+        ink: '#2C2621',
+        stone: { 300:'#D6CFC4', 400:'#8E8276', 500:'#6F645A' },
+        coral: '#F25C54',
+        matcha: '#4F9D69',
+        yolk: '#FFC63D',
+        clay: '#D97A58',
+      },
+      borderRadius: { '4xl': '28px' }
+    }
+  }
+}
+</script>
+<style>
+.dotgrid{ background-image: radial-gradient(#EAE2D3 1.5px, transparent 1.5px); background-size: 22px 22px; }
+.option-card:hover .logo-bg { transform: scale(1.05); }
+.logo-bg { transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+</style>
+</head>
+<body class="bg-cream text-ink font-sans min-h-screen antialiased dotgrid p-8 md:p-16">
+
+  <div class="max-w-6xl mx-auto">
+    <header class="mb-16 text-center">
+      <h1 class="font-display font-extrabold text-5xl mb-4 tracking-tighter italic text-coral">Coin Compass</h1>
+      <p class="text-stone-500 font-medium tracking-wide uppercase text-xs">New Name · Identity Exploration</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+      <!-- OPTION 1: THE WINNER (TILTED) -->
+      <button class="option-card group bg-white rounded-4xl border-4 border-matcha p-10 shadow-2xl transition-all flex flex-col items-center text-center scale-105 relative overflow-hidden">
+        <div class="absolute top-4 right-4 px-3 py-1 bg-matcha text-white text-[10px] font-black uppercase tracking-widest rounded-full">Winner</div>
+        <div class="w-40 h-40 mb-4 relative flex items-center justify-center">
+            <div class="logo-bg absolute inset-0 bg-yolk rounded-full"></div>
+            <svg viewBox="0 0 100 100" class="relative w-32 h-32">
+                <circle cx="50" cy="50" r="44" fill="none" stroke="#2C2621" stroke-width="3" stroke-dasharray="5 5"/>
+                <path d="M50 10L50 15M50 85L50 90M10 50L15 50M85 50L90 50" stroke="#2C2621" stroke-width="3" stroke-linecap="round"/>
+                <!-- Tilted Needle -->
+                <path d="M50 15L58 50L50 85L42 50Z" fill="#2C2621" transform="rotate(15, 50, 50)"/>
+                <circle cx="50" cy="50" r="12" fill="#F25C54"/>
+                <text x="50" y="55" text-anchor="middle" fill="white" font-family="Sora" font-weight="900" font-size="14">$</text>
+            </svg>
+        </div>
+        <h3 class="font-display font-bold text-xl mb-3">Coin Compass</h3>
+        <p class="text-xs text-stone-400 leading-relaxed">The final tilted coin-pointer. Playful, navigational, and perfectly off-balance.</p>
+        <div class="mt-6 px-4 py-1.5 bg-matcha text-white rounded-full text-[10px] font-bold uppercase tracking-widest">Final Identity</div>
+      </button>
+
+      <!-- OPTION 2: THE WORLD-LOOP -->
+      <button class="option-card group bg-white rounded-4xl border border-[#EFE9DE] p-10 shadow-sm hover:shadow-xl hover:border-matcha transition-all flex flex-col items-center text-center">
+        <div class="w-32 h-32 mb-8 relative flex items-center justify-center">
+            <div class="logo-bg absolute inset-0 bg-matcha rounded-3xl rotate-12"></div>
+            <svg viewBox="0 0 100 100" class="relative w-20 h-20">
+                <path d="M20 50Q20 20 50 20Q80 20 80 50Q80 80 50 80Q20 80 20 50" stroke="#FCF9F2" stroke-width="8" stroke-linecap="round" fill="none"/>
+                <path d="M50 10L50 90M10 50L90 50" stroke="#2C2621" stroke-width="2" stroke-dasharray="4 4"/>
+                <rect x="40" y="40" width="20" height="20" rx="6" fill="#2C2621"/>
+                <text x="50" y="55" text-anchor="middle" fill="#FFC63D" font-family="Sora" font-weight="900" font-size="14">¢</text>
+            </svg>
+        </div>
+        <h3 class="font-display font-bold text-xl mb-3">The World-Loop</h3>
+        <p class="text-xs text-stone-400 leading-relaxed">A path forming a coin shape, emphasizing the traveler's journey.</p>
+        <div class="mt-6 px-4 py-1.5 bg-cream rounded-full text-[10px] font-bold uppercase text-stone-400 group-hover:text-ink">Option 02</div>
+      </button>
+
+      <!-- OPTION 3: THE CURIOUS MARKER -->
+      <button class="option-card group bg-white rounded-4xl border border-[#EFE9DE] p-10 shadow-sm hover:shadow-xl hover:border-coral transition-all flex flex-col items-center text-center">
+        <div class="w-32 h-32 mb-8 relative flex items-center justify-center">
+            <div class="logo-bg absolute inset-0 bg-coral rounded-[40px]"></div>
+            <svg viewBox="0 0 100 100" class="relative w-20 h-20">
+                <path d="M50 85C50 85 80 60 80 40C80 23.4 66.6 10 50 10C33.4 10 20 23.4 20 40C20 60 50 85 50 85Z" fill="#2C2621"/>
+                <circle cx="50" cy="40" r="15" fill="#FFC63D"/>
+                <text x="50" y="46" text-anchor="middle" fill="#2C2621" font-family="Sora" font-weight="900" font-size="18">€</text>
+            </svg>
+        </div>
+        <h3 class="font-display font-bold text-xl mb-3">The Curious Marker</h3>
+        <p class="text-xs text-stone-400 leading-relaxed">A map marker containing a coin. Perfect for location-based curiosity.</p>
+        <div class="mt-6 px-4 py-1.5 bg-cream rounded-full text-[10px] font-bold uppercase text-stone-400 group-hover:text-ink">Option 03</div>
+      </button>
+
+    </div>
+
+    <!-- PREVIEW AREA -->
+    <section class="mt-16 bg-ink rounded-4xl p-12 text-center border border-stone-300">
+        <div class="max-w-md mx-auto">
+            <p class="text-stone-400 text-[10px] uppercase tracking-[0.2em] font-bold mb-8">Quick App Header Preview</p>
+            <div class="bg-cream rounded-2xl p-4 flex items-center justify-between shadow-2xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-yolk flex items-center justify-center">
+                        <svg viewBox="0 0 100 100" class="w-6 h-6">
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="#2C2621" stroke-width="4" stroke-dasharray="8 8"/>
+                            <path d="M50 20L55 50L50 80L45 50Z" fill="#2C2621"/>
+                            <circle cx="50" cy="50" r="10" fill="#F25C54"/>
+                        </svg>
+                    </div>
+                    <span class="font-display font-extrabold text-xl text-ink tracking-tight">Coin Compass</span>
+                </div>
+                <div class="w-8 h-8 rounded-full border border-stone-300 flex items-center justify-center"><i class="ph ph-list"></i></div>
+            </div>
+            <p class="mt-8 text-stone-500 text-sm italic">"Let curiosity be your north star."</p>
+        </div>
+    </section>
+
+  </div>
+
+</body>
+</html>

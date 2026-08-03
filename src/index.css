@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #FCF9F2;
+  --color-ink: #2C2621;
+  --color-surface: #FFFFFF;
+  --color-stone-200: #EAE9DE;
+  --color-stone-300: #D6CFC4;
+  --color-stone-400: #8E8276;
+  --color-stone-500: #6F645A;
+  --color-coral: #F25C54;
+  --color-matcha: #4F9D69;
+  --color-yolk: #FFC63D;
+  --color-clay: #D97A58;
+  --color-shadow-light: rgba(44,38,33,0.05);
+  --color-shadow-medium: rgba(44,38,33,0.06);
+  --color-border-light: rgba(255,255,255,0.10);
+  
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+  --font-display: "Sora", sans-serif;
+  
+  --radius-4xl: 28px;
+}
+
+/* Custom utilities from design files */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .dotgrid {
+    background-image: radial-gradient(#EAE2D3 1.5px, transparent 1.5px);
+    background-size: 22px 22px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .dotgrid {
+      background-image: radial-gradient(#3D352F 1.5px, transparent 1.5px);
+    }
+  }
+
+  .dotgrid-mobile {
+    background-size: 18px 18px;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+

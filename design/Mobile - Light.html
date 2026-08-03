@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coin Compass — Explore Currencies</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+        display: ['"Sora"', 'sans-serif'],
+      },
+      colors: {
+        cream: '#FCF9F2',
+        ink: '#2C2621',
+        stone: { 300:'#D6CFC4', 400:'#8E8276', 500:'#6F645A' },
+        coral: '#F25C54',
+        matcha: '#4F9D69',
+        yolk: '#FFC63D',
+        clay: '#D97A58',
+      },
+      borderRadius: { '4xl': '28px' }
+    }
+  }
+}
+</script>
+<style>
+::-webkit-scrollbar{ width:0; height:0; }
+body{ -ms-overflow-style:none; scrollbar-width:none; }
+.dotgrid{ background-image: radial-gradient(#EAE2D3 1.5px, transparent 1.5px); background-size: 18px 18px; }
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+.float { animation: float 3s ease-in-out infinite; }
+</style>
+</head>
+<body class="bg-cream text-ink font-sans flex flex-col antialiased dotgrid">
+
+  <!-- Mobile Header -->
+  <header id="header" class="w-full px-5 py-5 flex justify-between items-center sticky top-0 bg-cream/80 backdrop-blur-md z-10 border-b border-[#EFE9DE]">
+    <div class="flex items-center gap-2">
+      <div class="w-8 h-8 rounded-lg bg-yolk flex items-center justify-center relative">
+        <svg viewBox="0 0 100 100" class="w-6 h-6">
+          <circle cx="50" cy="50" r="44" fill="none" stroke="#2C2621" stroke-width="6" stroke-dasharray="8 8"/>
+          <path d="M50 15L58 50L50 85L42 50Z" fill="#2C2621" transform="rotate(15, 50, 50)"/>
+          <circle cx="50" cy="50" r="12" fill="#F25C54"/>
+        </svg>
+      </div>
+      <span class="font-display font-extrabold text-xl tracking-tight">Coin Compass</span>
+    </div>
+    <div class="flex gap-2">
+      <button class="w-8 h-8 rounded-full border border-stone-300 flex items-center justify-center bg-white"><i class="ph ph-gear"></i></button>
+      <button class="w-8 h-8 rounded-full border border-stone-300 flex items-center justify-center bg-white"><i class="ph ph-heart"></i></button>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full px-5 py-8 flex flex-col items-center">
+    
+    <!-- THE CORE INPUT -->
+    <section id="converter-base" class="w-full text-center mb-12">
+      <p class="text-[10px] font-bold text-coral tracking-widest uppercase mb-3 italic">I have exactly...</p>
+      
+      <div class="relative group">
+        <div class="absolute -inset-1 bg-gradient-to-r from-coral via-yolk to-matcha rounded-4xl opacity-20 blur-md transition-opacity"></div>
+        <div class="relative bg-white border border-[#EFE9DE] rounded-[32px] p-6 shadow-[0_15px_40px_rgba(44,38,33,0.05)]">
+          <div class="flex flex-col items-center gap-6">
+            
+            <!-- Amount -->
+            <div class="flex flex-col items-center w-full">
+              <input type="number" value="100" class="w-full bg-transparent border-none text-center font-display font-black text-6xl focus:ring-0 text-ink placeholder-stone-300" />
+            </div>
+
+            <!-- Currency Toggle -->
+            <button class="flex items-center gap-3 bg-cream border border-stone-300 rounded-3xl px-5 py-3 hover:bg-stone-300/10 transition-colors w-full justify-center">
+              <span class="w-8 h-8 rounded-full bg-ink text-cream flex items-center justify-center font-display font-bold text-base">$</span>
+              <div class="text-left">
+                <div class="font-black text-lg leading-none">USD</div>
+                <div class="text-[9px] font-bold text-stone-400 uppercase tracking-widest mt-0.5">Dollar</div>
+              </div>
+              <i class="ph-bold ph-caret-down text-stone-500 ml-1"></i>
+            </button>
+
+          </div>
+        </div>
+      </div>
+      
+      <!-- Quick Actions -->
+      <div class="mt-6 flex gap-2 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
+        <button class="shrink-0 px-4 py-2 rounded-full bg-white border border-stone-300 text-[11px] font-bold">Quick: $50</button>
+        <button class="shrink-0 px-4 py-2 rounded-full bg-white border border-stone-300 text-[11px] font-bold">Quick: $1,000</button>
+        <button class="shrink-0 px-4 py-2 rounded-full bg-white border border-stone-300 text-[11px] font-bold">Round Up</button>
+      </div>
+    </section>
+
+    <!-- THE EXPLOSION OF MANY -->
+    <section id="conversions-grid" class="w-full">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="font-display font-extrabold text-lg tracking-tight">Around the world...</h2>
+        <button class="p-2 bg-white border border-stone-300 rounded-full"><i class="ph ph-plus"></i></button>
+      </div>
+
+      <div class="flex flex-col gap-5">
+        
+        <!-- JPY -->
+        <div class="bg-white rounded-[28px] border border-[#EFE9DE] p-5 shadow-sm active:scale-[0.98] transition-transform relative overflow-hidden">
+          <div class="absolute -top-4 -right-4 w-16 h-16 bg-coral/5 rounded-full blur-2xl"></div>
+          <div class="flex justify-between items-start mb-5">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-cream flex items-center justify-center text-ink font-display font-black text-lg">¥</div>
+              <div>
+                <div class="font-black text-base leading-tight">15,420</div>
+                <div class="text-[9px] font-bold text-stone-400 uppercase tracking-widest">Japanese Yen</div>
+              </div>
+            </div>
+            <i class="ph ph-heart text-stone-300 text-lg"></i>
+          </div>
+          <div class="space-y-3">
+            <div class="flex items-center gap-3 text-xs font-medium text-stone-500">
+              <i class="ph-fill ph-bowl-food text-matcha text-base"></i>
+              <span>~ 18 Bowls of Tonkotsu Ramen</span>
+            </div>
+            <div class="flex items-center gap-3 text-xs font-medium text-stone-500">
+              <i class="ph-fill ph-train text-coral text-base"></i>
+              <span>1.5 Shinkansen Tickets</span>
+            </div>
+          </div>
+          <div class="mt-6 pt-4 border-t border-[#EFE9DE] flex justify-between items-center">
+            <span class="text-[9px] font-bold text-stone-400 uppercase">1 USD = 154.2 ¥</span>
+            <span class="text-[9px] font-bold text-matcha uppercase flex items-center gap-1">
+                <span class="w-1 h-1 rounded-full bg-matcha"></span> Gaining Power
+            </span>
+          </div>
+        </div>
+
+        <!-- Add New Card -->
+        <button class="border-2 border-dashed border-stone-300 rounded-[28px] p-8 flex flex-col items-center justify-center gap-3 text-stone-400 active:bg-white active:border-ink active:text-ink transition-all">
+          <div class="w-12 h-12 rounded-full bg-stone-100 flex items-center justify-center">
+            <i class="ph-bold ph-plus text-xl"></i>
+          </div>
+          <div class="text-center">
+            <div class="font-display font-bold text-sm">Add Another</div>
+            <p class="text-[10px]">What's on your mind?</p>
+          </div>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- TRIVIA FOOTER -->
+    <section class="mt-12 w-full">
+      <div class="bg-[#2C2621] rounded-[32px] p-6 relative overflow-hidden">
+        <div class="absolute inset-0 dotgrid opacity-10"></div>
+        <div class="flex flex-col items-center text-center relative gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-coral flex items-center justify-center text-cream float">
+            <i class="ph-fill ph-lightbulb text-2xl"></i>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-lg text-cream mb-2">Did you know?</h3>
+            <p class="text-[13px] text-cream/70 leading-relaxed">The <span class="text-yolk font-bold">Yap Islands</span> use giant limestone discs called Rai stones as currency. Some are 12 feet tall! They don't even move them when they spend them.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" class="w-full py-8 text-center text-[9px] font-bold text-stone-400 uppercase tracking-widest">
+    Coin Compass &copy; 2024 · Let curiosity be your north star
+  </footer>
+
+  <div class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-ink/90 backdrop-blur-md px-6 py-3 rounded-full flex gap-8 items-center border border-white/10 shadow-2xl z-20">
+    <button class="text-yolk"><i class="ph-fill ph-house-line text-xl"></i></button>
+    <button class="text-cream/50"><i class="ph ph-magnifying-glass text-xl"></i></button>
+    <button class="text-cream/50"><i class="ph ph-user text-xl"></i></button>
+  </div>
+
+</body>
+</html>
