@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
 import './App.css'
 import Header from './components/Header'
+import { BaseCurrency } from './components/BaseCurrency';
+import { CurrencyProvider } from './contexts/CurrencyContext';
 
 function App() {
 
@@ -14,8 +16,10 @@ function App() {
   }, [])
 
   return (
+    <CurrencyProvider>
       <Header />
-
+      <BaseCurrency />
+    </CurrencyProvider>
   )
 }
 
