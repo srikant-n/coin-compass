@@ -1,14 +1,14 @@
-import { useCurrency } from '../contexts/CurrencyContext';
-import { currenciesByCode } from '../data/currencies';
-import currencies from '../data/currencies.json';
+import { useCurrency } from '../../contexts/CurrencyContext';
+import { currenciesByCode } from '../../data/currencies';
+import currencies from '../../data/currencies.json';
 
 export function BaseCurrency() {
   const { baseCurrency, amount, setAmount, setBaseCurrency } = useCurrency();
   const currency = currenciesByCode[baseCurrency];
 
   return (
-    <section id="converter-base" className="w-full max-w-2xl text-center mb-16 mx-auto">
-      <p className="text-xs font-bold text-coral tracking-widest uppercase mb-4 italic">I have exactly...</p>
+    <section id="converter-base" aria-labelledby="base-currency-heading" className="w-full max-w-2xl text-center mb-16 mx-auto">
+      <p id="base-currency-heading" className="text-xs font-bold text-coral tracking-widest uppercase mb-4 italic">I have exactly...</p>
 
       <div className="relative group">
         <div className="absolute -inset-1 bg-linear-to-r from-coral via-yolk to-matcha rounded-[40px] opacity-20 blur-lg group-hover:opacity-40 transition-opacity"></div>
@@ -20,6 +20,7 @@ export function BaseCurrency() {
               type="number"
               value={amount}
               onChange={(e) => setAmount(Number(e.target.value))}
+              aria-label="Enter amount"
               className="w-full bg-transparent border-b focus:border-b-2 focus:border-stone-700 border-stone-300 text-center font-display font-black text-5xl md:text-6xl focus:ring-0 text-ink placeholder-stone-300 focus:outline-0"
             />
 
@@ -28,15 +29,16 @@ export function BaseCurrency() {
               <select
                 value={baseCurrency}
                 onChange={(e) => setBaseCurrency(e.target.value)}
+                aria-label="Select base currency"
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               >
-                {currencies.map((curr) => (
+                {currencies.map((curr: any) => (
                   <option key={curr.iso_code} value={curr.iso_code}>
                     {curr.iso_code} - {curr.name} ({curr.symbol} )
                   </option>
                 ))}
               </select>
-              <div className="flex items-center gap-2 bg-cream border border-stone-300 rounded-3xl p-2 hover:bg-stone-300/10 transition-colors pointer-events-none">
+              <div aria-hidden="true" className="flex items-center gap-2 bg-cream border border-stone-300 rounded-3xl p-2 hover:bg-stone-300/10 transition-colors pointer-events-none">
                 <span className="w-6 h-6 md:w-10 md:h-10 rounded-full bg-ink text-cream flex items-center justify-center font-display font-bold text-md md:text-xl">{currency?.symbol || '$'}</span>
                 <div className="font-black text-md md:text-xl leading-none">{baseCurrency}</div>
                 <i className="ph-bold ph-caret-down text-stone-500 ml-2"></i>
@@ -50,18 +52,21 @@ export function BaseCurrency() {
       <div className="mt-8 flex justify-center gap-3">
         <button
           onClick={() => setAmount(50)}
+          aria-label={`Set amount to ${currency?.symbol || '$'}50`}
           className="px-4 py-1.5 rounded-full bg-white border border-stone-300 text-[11px] font-bold hover:border-ink transition-colors"
         >
           Quick: {currency?.symbol || '$'}50
         </button>
         <button
           onClick={() => setAmount(1000)}
+          aria-label={`Set amount to ${currency?.symbol || '$'}1,000`}
           className="px-4 py-1.5 rounded-full bg-white border border-stone-300 text-[11px] font-bold hover:border-ink transition-colors"
         >
           Quick: {currency?.symbol || '$'}1,000
         </button>
         <button
           onClick={() => setAmount(Math.ceil(amount / 100) * 100)}
+          aria-label="Round up amount to nearest hundred"
           className="px-4 py-1.5 rounded-full bg-white border border-stone-300 text-[11px] font-bold hover:border-ink transition-colors"
         >
           Round Up
