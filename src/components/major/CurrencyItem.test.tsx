@@ -2,13 +2,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CurrencyItem from './CurrencyItem';
+import { POPULAR_CURRENCIES, currenciesList } from '../../data/currencies';
 
 const removeCurrencyItem = vi.fn();
 const toggleFavorite = vi.fn();
+const updateCurrencyItem = vi.fn();
 
 vi.mock('../../contexts/CurrencyContext', () => ({
-  useCurrency: () => ({ removeCurrencyItem, toggleFavorite }),
+  useCurrency: () => ({
+    baseCurrency: 'USD',
+    removeCurrencyItem,
+    toggleFavorite,
+    updateCurrencyItem
+  })
 }));
+
+const aed = currenciesList.find(c => c.iso_code === 'AED');
 
 const baseProps = {
   id: 'test-1',
@@ -17,19 +26,14 @@ const baseProps = {
   symbol: '$',
   convertedAmount: 150,
   rate: 1.0,
-  isFavorite: false,
-  availableCurrencies: [
-    { iso_code: 'EUR', name: 'Euro', symbol: '€' },
-    { iso_code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
-    { iso_code: 'AED', name: 'United Arab Emirates Dirham', symbol: 'د.إ' },
-  ],
-  onCurrencyChange: vi.fn(),
+  isFavorite: false
 };
 
 describe('CurrencyItem', () => {
   beforeEach(() => {
     removeCurrencyItem.mockClear();
     toggleFavorite.mockClear();
+    updateCurrencyItem.mockClear();
   });
 
   it('renders currency details', () => {
@@ -62,8 +66,11 @@ describe('CurrencyItem', () => {
       select.querySelector('optgroup[label="Currencies"]')?.querySelectorAll('option') ?? []
     ).map((o) => (o as HTMLOptionElement).value);
 
-    expect(popularValues).toEqual(['EUR', 'JPY']);
-    expect(otherValues).toEqual(['AED']);
+    expect(popularValues).toContain('EUR');
+    expect(popularValues).toContain('JPY');
+    expect(popularValues.every(v => POPULAR_CURRENCIES.includes(v))).toBe(true);
+    expect(otherValues).toContain('AED');
+    expect(otherValues.every(v => !POPULAR_CURRENCIES.includes(v))).toBe(true);
   });
 
   it('calls removeCurrencyItem when the remove button is clicked', async () => {
@@ -82,14 +89,13 @@ describe('CurrencyItem', () => {
     expect(toggleFavorite).toHaveBeenCalledWith(baseProps.id);
   });
 
-  it('calls onCurrencyChange when the user selects a different currency', async () => {
+  it('calls updateCurrencyItem when the user selects a different currency', async () => {
     const user = userEvent.setup();
-    const onChange = vi.fn();
-    render(<CurrencyItem {...baseProps} onCurrencyChange={onChange} />);
+    render(<CurrencyItem {...baseProps} />);
 
     const select = screen.getByLabelText('Change currency');
     await user.selectOptions(select, 'AED');
 
-    expect(onChange).toHaveBeenCalledWith('AED', baseProps.availableCurrencies[2]);
+    expect(updateCurrencyItem).toHaveBeenCalledWith(baseProps.id, 'AED', aed);
   });
 });

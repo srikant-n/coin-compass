@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { useCurrency } from '../../contexts/CurrencyContext';
-import { POPULAR_CURRENCIES } from '../../data/currencies';
+import { currenciesList, POPULAR_CURRENCIES } from '../../data/currencies';
 import { HeartIcon, HeartStraightIcon, XIcon, CaretDownIcon } from '@phosphor-icons/react';
 
 interface CurrencyItemProps {
@@ -11,26 +11,25 @@ interface CurrencyItemProps {
   convertedAmount: number;
   rate: number;
   isFavorite: boolean;
-  availableCurrencies: any[];
-  onCurrencyChange?: (newCode: string, currencyData: any) => void;
 }
 
-export default function CurrencyItem({
+function CurrencyItem({
   id,
   code,
   name,
   symbol,
   convertedAmount,
   rate,
-  isFavorite,
-  availableCurrencies,
-  onCurrencyChange
+  isFavorite
 }: CurrencyItemProps) {
-  const { removeCurrencyItem, toggleFavorite } = useCurrency();
+  const { baseCurrency, removeCurrencyItem, toggleFavorite, updateCurrencyItem } = useCurrency();
   const [selectedCurrency, setSelectedCurrency] = useState(code);
 
-  // Split available currencies into popular and remaining for the dropdown
-  const popularSet = new Set(POPULAR_CURRENCIES);
+  const availableCurrencies = useMemo(() => {
+    return currenciesList.filter((c: any) => c.iso_code !== baseCurrency);
+  }, [baseCurrency]);
+
+  const popularSet = useMemo(() => new Set(POPULAR_CURRENCIES), []);
   const popularCurrencies = availableCurrencies.filter((c: any) => popularSet.has(c.iso_code));
   const otherCurrencies = availableCurrencies.filter((c: any) => !popularSet.has(c.iso_code));
 
@@ -45,9 +44,9 @@ export default function CurrencyItem({
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newCode = e.target.value;
     setSelectedCurrency(newCode);
-    if (onCurrencyChange) {
-      const currencyData = availableCurrencies.find((c: any) => c.iso_code === newCode);
-      onCurrencyChange(newCode, currencyData);
+    const currencyData = availableCurrencies.find((c: any) => c.iso_code === newCode);
+    if (currencyData) {
+      updateCurrencyItem(id, newCode, currencyData);
     }
   };
 
@@ -83,7 +82,7 @@ export default function CurrencyItem({
         </div>
       </div>
       <div className="mt-8 pt-5 border-t border-[#EFE9DE] flex justify-between items-center">
-        <span className="text-[10px] font-bold text-stone-400">1 USD = {rate} {symbol}</span>
+        <span className="text-[10px] font-bold text-stone-400">1 {baseCurrency} = {rate} {symbol}</span>
         <div className="relative">
           <select
             value={selectedCurrency}
@@ -91,8 +90,6 @@ export default function CurrencyItem({
             className="appearance-none bg-cream border border-stone-300 rounded-full px-3 py-1 pr-8 text-[10px] font-bold text-stone-600 hover:border-ink focus:outline-none focus:border-ink cursor-pointer"
             aria-label="Change currency"
           >
-            <option value={code}>{code}</option>
-            {/* Show popular currencies first, then the rest alphabetically */}
             {popularCurrencies.length > 0 && (
               <optgroup label="Popular">
                 {popularCurrencies.map((currency: any) => (
@@ -118,3 +115,5 @@ export default function CurrencyItem({
     </div>
   );
 }
+
+export default memo(CurrencyItem);

@@ -6,7 +6,7 @@ import { getLatestRates } from '../../api/currencyConversion';
 import { PlusIcon } from '@phosphor-icons/react';
 
 export default function ConversionSection() {
-  const { currencyItems, addCurrencyItem, baseCurrency, amount, updateCurrencyItem } = useCurrency();
+  const { currencyItems, addCurrencyItem, baseCurrency, amount } = useCurrency();
 
   const handleAddCurrency = async () => {
     const availableCurrency = currenciesList.find(
@@ -35,10 +35,6 @@ export default function ConversionSection() {
     }
   };
 
-  const handleCurrencyChange = (itemId: string, newCode: string, currencyData: any) => {
-    updateCurrencyItem(itemId, newCode, currencyData);
-  };
-
   return (
     <section id="conversions-grid" className="w-full max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-8">
@@ -55,25 +51,18 @@ export default function ConversionSection() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {currencyItems.map(item => {
-          const availableCurrencies = currenciesList.filter(
-            (c: any) => c.iso_code !== baseCurrency && c.iso_code !== item.code
-          );
-          return (
-            <CurrencyItem
-              key={item.id}
-              id={item.id}
-              code={item.code}
-              name={item.name}
-              symbol={item.symbol}
-              convertedAmount={item.convertedAmount}
-              rate={item.rate}
-              isFavorite={item.isFavorite}
-              availableCurrencies={availableCurrencies}
-              onCurrencyChange={(newCode, currencyData) => handleCurrencyChange(item.id, newCode, currencyData)}
-            />
-          );
-        })}
+        {currencyItems.map(item => (
+          <CurrencyItem
+            key={item.id}
+            id={item.id}
+            code={item.code}
+            name={item.name}
+            symbol={item.symbol}
+            convertedAmount={item.convertedAmount}
+            rate={item.rate}
+            isFavorite={item.isFavorite}
+          />
+        ))}
 
         {/* Add New Card */}
         <button
