@@ -1,8 +1,17 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CurrencyProvider } from '../../contexts/CurrencyContext';
 import ConversionSection from './ConversionSection';
+
+vi.mock('../../api/currencyConversion', () => ({
+  getLatestRates: vi.fn(async () => ({
+    amount: 1,
+    base: 'USD',
+    date: '2026-08-07',
+    rates: { EUR: 0.92, JPY: 150, GBP: 0.79 }
+  }))
+}));
 
 describe('ConversionSection', () => {
   const renderWithProvider = () =>
@@ -28,7 +37,7 @@ describe('ConversionSection', () => {
     await user.click(addButton);
 
     // Default base is USD, so the next sorted currency (EUR) is added
-    expect(screen.getByText('EUR - Euro')).toBeInTheDocument();
+    expect(await screen.findByText('EUR - Euro')).toBeInTheDocument();
     expect(screen.getByLabelText('Change currency')).toBeInTheDocument();
   });
 
@@ -40,7 +49,7 @@ describe('ConversionSection', () => {
     await user.click(addButton);
     await user.click(addButton);
 
-    expect(screen.getByText('EUR - Euro')).toBeInTheDocument();
-    expect(screen.getByText('JPY - Japanese Yen')).toBeInTheDocument();
+    expect(await screen.findByText('EUR - Euro')).toBeInTheDocument();
+    expect(await screen.findByText('JPY - Japanese Yen')).toBeInTheDocument();
   });
 });

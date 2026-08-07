@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { getLatestRates } from '../api/currencyConversion';
 
 export interface CurrencyItem {
   id: string;
@@ -19,7 +20,7 @@ interface CurrencyContextType {
   addCurrencyItem: (item: CurrencyItemInput) => void;
   removeCurrencyItem: (id: string) => void;
   toggleFavorite: (id: string) => void;
-  updateCurrencyItem: (id: string, newCode: string, currencyData: any) => void;
+  updateCurrencyItem: (id: string, newCode: string, currencyData: any) => Promise<void>;
 }
 
 export interface CurrencyItemInput {
@@ -58,25 +59,77 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     );
   };
 
-  const updateCurrencyItem = (id: string, _newCode: string, currencyData: any) => {
+  const updateCurrencyItem = async (id: string, newCode: string, currencyData: any) => {
     if (!currencyData) return;
 
-    setCurrencyItems(prev =>
-      prev.map(item =>
-        item.id === id
-          ? {
-              ...item,
-              code: currencyData.iso_code,
-              name: currencyData.name,
-              symbol: currencyData.symbol,
-              // Mock rate update - would be replaced with API call
-              rate: 1.0,
-              convertedAmount: item.convertedAmount // Keep same amount for now
-            }
-          : item
-      )
-    );
+    try {
+      const response = await getLatestRates(baseCurrency);
+      const rate = response.rates[newCode] ?? 1.0;
+      const convertedAmount = amount * rate;
+
+      setCurrencyItems(prev =>
+        prev.map(item =>
+          item.id === id
+            ? {
+                ...item,
+                code: currencyData.iso_code,
+                name: currencyData.name,
+                symbol: currencyData.symbol,
+                rate,
+                convertedAmount
+              }
+            : item
+        )
+      );
+    } catch (error) {
+      console.error('Failed to fetch exchange rate:', error);
+
+      setCurrencyItems(prev =>
+        prev.map(item =>
+          item.id === id
+            ? {
+                ...item,
+                code: currencyData.iso_code,
+                name: currencyData.name,
+                symbol: currencyData.symbol
+              }
+            : item
+        )
+      );
+    }
   };
+
+  useEffect(() => {
+    const updateAllRates = async () => {
+      if (currencyItems.length === 0) return;
+      try {
+        const response = await getLatestRates(baseCurrency);
+        setCurrencyItems(prev =>
+          prev.map(item => {
+            const rate = response.rates[item.code] ?? 1.0;
+            return {
+              ...item,
+              rate,
+              convertedAmount: amount * rate
+            };
+          })
+        );
+      } catch (error) {
+        console.error('Failed to update rates for base currency change:', error);
+      }
+    };
+
+    updateAllRates();
+  }, [baseCurrency]);
+
+  useEffect(() => {
+    setCurrencyItems(prev =>
+      prev.map(item => ({
+        ...item,
+        convertedAmount: amount * item.rate
+      }))
+    );
+  }, [amount]);
 
   return (
     <CurrencyContext.Provider value={{ 

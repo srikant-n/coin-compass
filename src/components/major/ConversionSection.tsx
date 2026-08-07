@@ -2,33 +2,37 @@ import { useCurrency } from '../../contexts/CurrencyContext';
 import CurrencyItem from './CurrencyItem';
 import { currenciesList } from '../../data/currencies';
 import type { CurrencyItemInput } from '../../contexts/CurrencyContext';
+import { getLatestRates } from '../../api/currencyConversion';
 import { PlusIcon } from '@phosphor-icons/react';
 
 export default function ConversionSection() {
   const { currencyItems, addCurrencyItem, baseCurrency, amount, updateCurrencyItem } = useCurrency();
 
-  const handleAddCurrency = () => {
-    // Find first available currency (not base currency and not already added)
+  const handleAddCurrency = async () => {
     const availableCurrency = currenciesList.find(
       (c: any) => c.iso_code !== baseCurrency && !currencyItems.some(item => item.code === c.iso_code)
     );
 
     if (!availableCurrency) return;
 
-    // Calculate converted amount (mock rate for now)
-    const mockRate = 1.0; // This would come from API
-    const convertedAmount = amount * mockRate;
+    try {
+      const response = await getLatestRates(baseCurrency);
+      const rate = response.rates[availableCurrency.iso_code] ?? 1.0;
+      const convertedAmount = amount * rate;
 
-    const newItem: CurrencyItemInput = {
-      code: availableCurrency.iso_code,
-      name: availableCurrency.name,
-      symbol: availableCurrency.symbol,
-      convertedAmount,
-      rate: mockRate,
-      isFavorite: false
-    };
+      const newItem: CurrencyItemInput = {
+        code: availableCurrency.iso_code,
+        name: availableCurrency.name,
+        symbol: availableCurrency.symbol,
+        convertedAmount,
+        rate,
+        isFavorite: false
+      };
 
-    addCurrencyItem(newItem);
+      addCurrencyItem(newItem);
+    } catch (error) {
+      console.error('Failed to fetch exchange rate:', error);
+    }
   };
 
   const handleCurrencyChange = (itemId: string, newCode: string, currencyData: any) => {
