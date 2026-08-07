@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BaseCurrency } from './BaseCurrency';
 import { CurrencyProvider } from '../../contexts/CurrencyContext';
+import { currenciesList, POPULAR_CURRENCIES } from '../../data/currencies';
 
 describe('BaseCurrency', () => {
   const renderWithProvider = () => {
@@ -305,6 +306,55 @@ describe('BaseCurrency', () => {
       await user.click(roundUpButton);
       
       expect(amountInput).toHaveValue(0);
+    });
+  });
+
+  describe('Dropdown grouping and sorting', () => {
+    it('groups options under "Popular" and "Currencies"', () => {
+      renderWithProvider();
+
+      const select = screen.getByLabelText('Select base currency');
+      const groups = select.querySelectorAll('optgroup');
+
+      expect(groups).toHaveLength(2);
+      expect(groups[0]).toHaveAttribute('label', 'Popular');
+      expect(groups[1]).toHaveAttribute('label', 'Currencies');
+    });
+
+    it('lists all currencies exactly once', () => {
+      renderWithProvider();
+
+      const select = screen.getByLabelText('Select base currency');
+      const options = select.querySelectorAll('option');
+
+      expect(options).toHaveLength(currenciesList.length);
+    });
+
+    it('lists popular currencies first', () => {
+      renderWithProvider();
+
+      const select = screen.getByLabelText('Select base currency');
+      const popularOptions = select.querySelector('optgroup[label="Popular"]')?.querySelectorAll('option');
+      const popularCodes = Array.from(popularOptions ?? []).map((o) => (o as HTMLOptionElement).value);
+      const expected = currenciesList
+        .filter((c) => POPULAR_CURRENCIES.includes(c.iso_code))
+        .map((c) => c.iso_code);
+
+      expect(popularCodes).toEqual(expected);
+    });
+
+    it('sorts remaining currencies alphabetically by name', () => {
+      renderWithProvider();
+
+      const select = screen.getByLabelText('Select base currency');
+      const otherOptions = select.querySelector('optgroup[label="Currencies"]')?.querySelectorAll('option');
+      const otherNames = Array.from(otherOptions ?? []).map((o) => {
+        const currency = currenciesList.find((c) => c.iso_code === (o as HTMLOptionElement).value);
+        return currency?.name;
+      });
+      const sorted = [...otherNames].filter(Boolean).sort((a, b) => (a as string).localeCompare(b as string));
+
+      expect(otherNames).toEqual(sorted);
     });
   });
 });

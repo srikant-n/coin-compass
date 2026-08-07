@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import './App.css'
 import Header from './components/minor/Header'
 import { BaseCurrency } from './components/major/BaseCurrency';
+import ConversionSection from './components/major/ConversionSection';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
     <CurrencyProvider>
       <Header />
       <BaseCurrency />
+      <ConversionSection />
     </CurrencyProvider>
   )
 }
