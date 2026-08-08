@@ -8,7 +8,7 @@ export default function Header() {
     <header id="header" className="w-full px-8 py-6 flex justify-between gap-3 items-center max-w-6xl mx-auto">
       <div className="flex items-center gap-3">
         <Logo size={40}/>  
-        <h1 className="font-display font-extrabold text-2xl tracking-tight dark:text-cream">Coin Compass - Explore Currencies</h1>
+        <h1 className="font-display font-extrabold text-2xl tracking-tight dark:text-cream">Coin Compass<span className="hidden md:inline"> - Explore Currencies</span></h1>
       </div>
       <div className="flex items-center bg-white dark:bg-surface border border-stone-300 dark:border-stone-300 rounded-full p-1" role="group" aria-label="View mode">
         <button
