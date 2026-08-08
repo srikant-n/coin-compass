@@ -24,6 +24,19 @@
   --radius-4xl: 28px;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-ink: #1A1613;
+    --color-surface: #2C2621;
+    --color-stone-300: #4A423B;
+    --color-stone-500: #D6CFC4;
+    --color-coral: #FF7069;
+    --color-matcha: #64C284;
+    --color-yolk: #FFD363;
+    --color-clay: #E88B6A;
+  }
+}
+
 /* Custom utilities from design files */
 @layer utilities {
   .scrollbar-hide {
@@ -59,4 +72,3 @@
 .float {
   animation: float 3s ease-in-out infinite;
 }
-

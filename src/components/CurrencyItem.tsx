@@ -44,14 +44,14 @@ function CurrencyItem({
   };
 
   return (
-    <div className="group bg-white rounded-4xl border border-[#EFE9DE] p-7 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all relative overflow-hidden">
+    <div className="group bg-white dark:bg-surface rounded-4xl border border-[#EFE9DE] dark:border-stone-300 p-7 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all relative overflow-hidden">
       <div className="flex justify-between items-start mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-cream flex items-center justify-center text-ink font-display font-black text-xl">
+          <div className="w-12 h-12 rounded-2xl bg-cream dark:bg-ink flex items-center justify-center text-ink dark:text-cream font-display font-black text-xl">
             {symbol}
           </div>
           <div>
-            <div className="font-black text-lg leading-tight">{convertedAmount.toLocaleString()}</div>
+            <div className="font-black text-lg leading-tight dark:text-cream">{convertedAmount.toLocaleString()}</div>
             <div className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{code} - {name}</div>
           </div>
         </div>
@@ -74,8 +74,8 @@ function CurrencyItem({
           </button>
         </div>
       </div>
-      <div className="mt-8 pt-5 border-t border-[#EFE9DE] flex justify-between items-center">
-        <span className="text-[10px] font-bold text-stone-400">1 {baseCurrency} = {rate} {symbol}</span>
+      <div className="mt-8 pt-5 border-t border-[#EFE9DE] dark:border-stone-300 flex justify-between items-center">
+        <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">1 {baseCurrency} = {rate} {symbol}</span>
         <div className="relative">
           <CurrencySelect
             value={selectedCurrency}
@@ -83,9 +83,9 @@ function CurrencyItem({
             ariaLabel="Change currency"
             currencies={currenciesList.filter((c) => c.iso_code !== baseCurrency)}
             favourites={favouriteCurrencies}
-            className="appearance-none bg-cream border border-stone-300 rounded-full px-3 py-1 pr-8 text-[10px] font-bold text-stone-600 hover:border-ink focus:outline-none focus:border-ink cursor-pointer"
+            className="appearance-none bg-cream dark:bg-ink border border-stone-300 dark:border-stone-300 rounded-full px-3 py-1 pr-8 text-[10px] font-bold text-stone-500 hover:border-ink dark:hover:border-cream focus:outline-none focus:border-ink dark:focus:border-cream cursor-pointer"
           />
-          <CaretDownIcon className="absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none text-xs" weight="bold" />
+          <CaretDownIcon className="absolute right-2 top-1/2 -translate-y-1/2 text-stone-500 pointer-events-none text-xs" weight="bold" />
         </div>
       </div>
     </div>

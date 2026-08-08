@@ -38,11 +38,11 @@ export default function ConversionSection() {
   return (
     <section id="conversions-grid" className="w-full max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-8">
-        <h2 className="font-display font-extrabold text-2xl tracking-tight">Around the world, that's...</h2>
+        <h2 className="font-display font-extrabold text-2xl tracking-tight dark:text-cream">Around the world, that's...</h2>
         <div className="flex gap-2">
           <button
             onClick={handleAddCurrency}
-            className="px-4 py-2 bg-white border border-stone-300 rounded-full text-xs font-bold flex items-center gap-2 hover:border-ink transition-colors"
+            className="px-4 py-2 bg-white dark:bg-surface border border-stone-300 dark:border-stone-300 rounded-full text-xs font-bold dark:text-stone-500 flex items-center gap-2 hover:border-ink dark:hover:border-cream dark:hover:text-cream transition-colors"
             aria-label="Add currency"
           >
             <PlusIcon /> Add Currency
@@ -67,10 +67,10 @@ export default function ConversionSection() {
         {/* Add New Card */}
         <button
           onClick={handleAddCurrency}
-          className="group border-2 border-dashed border-stone-300 rounded-4xl p-7 flex flex-col items-center justify-center gap-4 hover:border-ink hover:bg-white transition-all text-stone-400 hover:text-ink"
+          className="group border-2 border-dashed border-stone-300 dark:border-stone-300 rounded-4xl p-7 flex flex-col items-center justify-center gap-4 hover:border-ink dark:hover:border-cream hover:bg-white dark:hover:bg-surface transition-all text-stone-400 dark:text-stone-400 hover:text-ink dark:hover:text-cream"
           aria-label="Add another currency"
         >
-          <div className="w-14 h-14 rounded-full bg-stone-100 flex items-center justify-center group-hover:bg-yolk transition-colors">
+          <div className="w-14 h-14 rounded-full bg-stone-100 dark:bg-ink flex items-center justify-center group-hover:bg-yolk dark:group-hover:bg-yolk group-hover:text-ink dark:group-hover:text-ink transition-colors">
             <PlusIcon weight="bold" className="text-2xl" />
           </div>
           <div className="text-center">
