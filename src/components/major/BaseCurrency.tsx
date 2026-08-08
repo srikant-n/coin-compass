@@ -35,7 +35,7 @@ export function BaseCurrency() {
                 value={baseCurrency}
                 onChange={(e) => setBaseCurrency(e.target.value)}
                 aria-label="Select base currency"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10appearance-none bg-cream border border-stone-300 rounded-full px-3 py-1 pr-8 text-[10px] font-bold text-stone-600 hover:border-ink focus:outline-none focus:border-ink cursor-pointer w-full"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 appearance-none bg-cream border border-stone-300 rounded-full px-3 py-1 pr-8 text-[10px] font-bold text-stone-600 hover:border-ink focus:outline-none focus:border-ink"
               >
                 {/* Grouped by popularity, then alphabetically */}
                 <optgroup label="Popular">

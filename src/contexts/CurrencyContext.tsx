@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { getLatestRates } from '../api/currencyConversion';
+import { currenciesByCode } from '../data/currencies';
 
 export interface CurrencyItem {
   id: string;
@@ -34,10 +35,58 @@ export interface CurrencyItemInput {
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
+const BASE_CURRENCY_KEY = 'baseCurrency';
+const SELECTED_CURRENCIES_KEY = 'selectedCurrencies';
+
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [baseCurrency, setBaseCurrency] = useState<string>('USD');
+  const [baseCurrency, setBaseCurrency] = useState<string>(() => {
+    if (typeof window === 'undefined') return 'USD';
+    try {
+      const stored = localStorage.getItem(BASE_CURRENCY_KEY);
+      return stored || 'USD';
+    } catch {
+      return 'USD';
+    }
+  });
   const [amount, setAmount] = useState<number>(100);
-  const [currencyItems, setCurrencyItems] = useState<CurrencyItem[]>([]);
+  const [currencyItems, setCurrencyItems] = useState<CurrencyItem[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const stored = localStorage.getItem(SELECTED_CURRENCIES_KEY);
+      if (stored) return JSON.parse(stored) as CurrencyItem[];
+
+      const storedBase = localStorage.getItem(BASE_CURRENCY_KEY) || 'USD';
+      const defaultCode = storedBase === 'EUR' ? 'USD' : 'EUR';
+      const currency = currenciesByCode[defaultCode];
+      if (!currency) return [];
+
+      return [{
+        id: `${defaultCode}-default`,
+        code: defaultCode,
+        name: currency.name,
+        symbol: currency.symbol,
+        convertedAmount: 100,
+        rate: 1,
+        isFavorite: false
+      }];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(BASE_CURRENCY_KEY, baseCurrency);
+    } catch {}
+  }, [baseCurrency]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(SELECTED_CURRENCIES_KEY, JSON.stringify(currencyItems));
+    } catch {}
+  }, [currencyItems]);
 
   const addCurrencyItem = (item: CurrencyItemInput) => {
     const newItem: CurrencyItem = {
