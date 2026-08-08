@@ -6,6 +6,11 @@ import { HeartIcon, HeartStraightIcon, XIcon, CaretDownIcon } from '@phosphor-ic
 import CurrencySelect from './CurrencySelect';
 import CountrySelect from './CountrySelect';
 
+// Format a number with up to 2 decimal places using the user's locale.
+const formatNumber = (value: number) =>
+  value.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 0 });
+
+// Props for an individual currency display item.
 interface CurrencyItemProps {
   id: string;
   code: string;
@@ -31,26 +36,34 @@ function CurrencyItem({
   ppp,
   pppAmount
 }: CurrencyItemProps) {
+  // Global currency state and actions from context.
   const { viewMode, baseCurrency, baseCountry, removeCurrencyItem, togglefavourite, updateCurrencyItem, favouriteCurrencies } = useCurrency();
+
+  // Local state mirrors the prop values so the select inputs stay controlled.
   const [selectedCurrency, setSelectedCurrency] = useState(code);
   const [selectedCountry, setSelectedCountry] = useState(country || '');
 
+  // Keep local currency state in sync when the prop changes.
   useEffect(() => {
     setSelectedCurrency(code);
   }, [code]);
 
+  // Keep local country state in sync when the prop changes.
   useEffect(() => {
     setSelectedCountry(country || '');
   }, [country]);
 
+  // Remove this currency item from the list.
   const handleRemove = () => {
     removeCurrencyItem(id);
   };
 
+  // Toggle this item's favourite status.
   const handleTogglefavourite = () => {
     togglefavourite(id);
   };
 
+  // Handle switching to a different currency from the dropdown.
   const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newCode = e.target.value;
     setSelectedCurrency(newCode);
@@ -60,6 +73,7 @@ function CurrencyItem({
     }
   };
 
+  // Handle switching to a different country from the dropdown.
   const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newCountry = e.target.value;
     setSelectedCountry(newCountry);
@@ -70,43 +84,52 @@ function CurrencyItem({
     void updateCurrencyItem(id, currencyData.iso_code, currencyData, countryData.name);
   };
 
+  // Countries available for selection, excluding the currently selected base country.
   const availableCountries = countriesListSorted.filter((c) => c.name !== baseCountry);
 
-  const displayLabel = viewMode === 'country' && country ? `${country}` : `${code} - ${name}`;
+  // Label shown under the converted amount; varies by country vs currency mode.
+  const displayLabel = viewMode === 'country' && country ? `${country} (${code})` : `${code} - ${name}`;
 
   return (
-    <div className="group bg-white dark:bg-surface rounded-4xl border border-[#EFE9DE] dark:border-stone-300 p-7 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all relative overflow-hidden">
+    <div className="group bg-white dark:bg-surface rounded-4xl border border-[#EFE9DE] dark:border-stone-300 p-5 mx-0.5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all relative overflow-hidden">
+      {/* Top section: amount, label, and action buttons. */}
       <div className="flex justify-between items-start mb-6">
         <div className="flex items-center gap-3 w-full">
+          {/* Currency symbol badge. */}
           <div className="w-12 h-12 rounded-2xl bg-cream dark:bg-ink flex items-center justify-center text-ink dark:text-cream font-display font-black text-xl">
             {symbol}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex gap-4 items-start">
               <div className="flex-1 min-w-0">
-                <div className="font-black text-lg leading-tight dark:text-cream">{convertedAmount.toLocaleString()}</div>
+                {/* Converted amount and currency/country label. */}
+                <div title={formatNumber(convertedAmount) } className="font-black text-lg leading-tight dark:text-cream truncate">{formatNumber(convertedAmount)}</div>
                 <div className="text-[10px] font-bold text-stone-400 uppercase tracking-widest truncate">{displayLabel}</div>
               </div>
+              {/* PPP adjusted amount shown only in country view. */}
               {viewMode === 'country' && (
                 <div className="flex-1 min-w-0">
-                  <div className="font-black text-lg leading-tight dark:text-cream">
-                    {pppAmount != null ? pppAmount.toLocaleString() : 'N/A'}
+                  <div title={pppAmount != null ? formatNumber(pppAmount) : 'N/A'} className="font-black text-lg leading-tight dark:text-cream truncate">
+                    {pppAmount != null ? formatNumber(pppAmount) : 'N/A'}
                   </div>
-                  <div className="text-[10px] font-bold text-coral uppercase tracking-widest truncate">PPP {code}</div>
+                  <div className="text-[10px] font-bold text-coral uppercase tracking-widest truncate"><abbr title="Purchasing Power Parity">PPP</abbr> Adjusted</div>
                 </div>
               )}
             </div>
           </div>
         </div>
+        {/* Favourite and remove action buttons. */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={handleTogglefavourite}
-            className={`cursor-pointer transition-colors text-xl ${isfavourite ? 'text-coral' : 'text-stone-300 hover:text-coral'}`}
-            title={isfavourite ? 'Remove from favourites' : 'Add to favourites'}
-            aria-label={isfavourite ? 'Remove from favourites' : 'Add to favourites'}
-          >
-            {isfavourite ? <HeartStraightIcon weight="fill" /> : <HeartIcon />}
-          </button>
+          {viewMode !== 'country' && (
+            <button
+              onClick={handleTogglefavourite}
+              className={`cursor-pointer transition-colors text-xl ${isfavourite ? 'text-coral' : 'text-stone-300 hover:text-coral'}`}
+              title={isfavourite ? 'Remove from favourites' : 'Add to favourites'}
+              aria-label={isfavourite ? 'Remove from favourites' : 'Add to favourites'}
+            >
+              {isfavourite ? <HeartStraightIcon weight="fill" /> : <HeartIcon />}
+            </button>
+          )}
           <button
             onClick={handleRemove}
             className="cursor-pointer text-stone-300 hover:text-red-500 transition-colors text-xl"
@@ -117,12 +140,19 @@ function CurrencyItem({
           </button>
         </div>
       </div>
-      <div className="mt-8 pt-5 border-t border-[#EFE9DE] dark:border-stone-300 flex justify-between items-center">
-        <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">
-          1 {baseCurrency} = {rate} {symbol}
-          {viewMode === 'country' && ppp != null ? ` · PPP ${ppp}` : ''}
+      {/* Bottom section: exchange rate and selector dropdown. */}
+      <div className="mt-4 pt-2 border-t border-[#EFE9DE] dark:border-stone-300 flex justify-between items-center">
+        <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest inline-flex flex-wrap items-baseline gap-x-1">
+          1 {baseCurrency} = {formatNumber(rate)} {symbol}
+          {/* PPP index shown only in country view when available. */}
+          {viewMode === 'country' && ppp != null ? (
+            <span className="whitespace-nowrap">
+              · <abbr title="Purchasing Power Parity">PPP</abbr> Index: {formatNumber(ppp)}
+            </span>
+          ) : null}
         </span>
         <div className="relative">
+          {/* Render CountrySelect in country view, otherwise CurrencySelect. */}
           {viewMode === 'country' ? (
             <CountrySelect
               value={selectedCountry}

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { POPULAR_CURRENCIES } from '../data/currencies';
 import type { Currency } from '../data/currencies';
 
+// Props for rendering a searchable/selectable list of currencies.
 interface CurrencySelectProps {
   value: string;
   onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -21,12 +22,15 @@ export default function CurrencySelect({
   showFullLabel = false,
   favourites = []
 }: CurrencySelectProps) {
+  // Lookup sets and maps used to partition the currency list efficiently.
   const popularSet = useMemo(() => new Set(POPULAR_CURRENCIES), []);
   const favouritesSet = useMemo(() => new Set(favourites), [favourites]);
   const currencyByCode = useMemo(
     () => new Map(currencies.map((c) => [c.iso_code, c])),
     [currencies]
   );
+
+  // Split currencies into favourites, popular, and the rest for grouped rendering.
   const favouriteCurrencies = useMemo(
     () => favourites.map((code) => currencyByCode.get(code)).filter((c): c is Currency => !!c),
     [favourites, currencyByCode]
@@ -40,6 +44,7 @@ export default function CurrencySelect({
     [currencies, favouritesSet, popularSet]
   );
 
+  // Render either the ISO code alone or the full "Code - Name (Symbol)" label.
   const label = (currency: Currency) =>
     showFullLabel
       ? `${currency.iso_code} - ${currency.name} (${currency.symbol})`
@@ -52,6 +57,7 @@ export default function CurrencySelect({
       aria-label={ariaLabel}
       className={className}
     >
+      {/* Favourites first, if any exist. */}
       {favouriteCurrencies.length > 0 && (
         <optgroup label="favourites">
           {favouriteCurrencies.map((currency) => (
@@ -61,6 +67,7 @@ export default function CurrencySelect({
           ))}
         </optgroup>
       )}
+      {/* Next, the most commonly used currencies. */}
       {popularCurrencies.length > 0 && (
         <optgroup label="Popular">
           {popularCurrencies.map((currency) => (
@@ -70,6 +77,7 @@ export default function CurrencySelect({
           ))}
         </optgroup>
       )}
+      {/* Finally, all remaining currencies. */}
       {otherCurrencies.length > 0 && (
         <optgroup label="Currencies">
           {otherCurrencies.map((currency) => (

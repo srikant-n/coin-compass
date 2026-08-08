@@ -25,7 +25,7 @@ export function BaseCurrency() {
               value={amount}
               onChange={(e) => setAmount(Number(e.target.value))}
               aria-label="Enter amount"
-              className="w-full bg-transparent border-b focus:border-b-2 focus:border-stone-700 border-stone-300 dark:border-none text-center font-display font-black text-5xl md:text-6xl focus:ring-0 text-ink dark:text-cream placeholder-stone-300 dark:placeholder-stone-400 focus:outline-0"
+              className="w-full bg-transparent border-b focus:border-b-2 focus:border-stone-700 border-stone-300 dark:border-none text-center font-display font-black text-5xl md:text-6xl focus:ring-0 text-ink dark:text-cream placeholder-stone-300 dark:placeholder-stone-400 focus:outline-0 no-spinners"
             />
 
             {/* Currency / Country Select */}

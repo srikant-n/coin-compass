@@ -10,6 +10,6 @@
 - [Cascade](https://devin.ai/) - Coding assistance
 
 ## Acknowledgments
-- [Frankfurter](https://frankfurter.dev/) - Currency exchange rates
+- [Exchange API](https://github.com/fawazahmed0/exchange-api) - Currency exchange rates
 - [World Bank](https://www.worldbank.org/en/programs/icp/data) - Purchasing Power Parity (PPP) data as of 2021
 

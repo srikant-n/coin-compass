@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { countriesListSorted } from '../data/countries';
 import type { Country } from '../data/countries';
 
+// Props for rendering a searchable/selectable list of countries.
 interface CountrySelectProps {
   value: string;
   onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -19,6 +20,7 @@ export default function CountrySelect({
   showFullLabel = false,
   countries
 }: CountrySelectProps) {
+  // Filter the full country list to the allowed subset, if one was provided.
   const options = useMemo(() => {
     const allowed = new Set(countries);
     return countries && countries.length > 0
@@ -26,6 +28,7 @@ export default function CountrySelect({
       : countriesListSorted;
   }, [countries]);
 
+  // Display either the country name or "Name (Currency)" depending on context.
   const label = (country: Country) =>
     showFullLabel ? `${country.name} (${country.currency_code})` : country.name;
 

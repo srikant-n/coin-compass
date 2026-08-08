@@ -113,14 +113,14 @@ export default function ConversionSection() {
         {/* Add New Card */}
         <button
           onClick={handleAdd}
-          className="group border-2 border-dashed border-stone-300 dark:border-stone-300 rounded-4xl p-7 flex flex-col items-center justify-center gap-4 hover:border-ink dark:hover:border-cream hover:bg-white dark:hover:bg-surface transition-all text-stone-400 dark:text-stone-400 hover:text-ink dark:hover:text-cream"
+          className="group h-full w-full bg-white dark:bg-surface border-2 border-dashed border-stone-300 dark:border-stone-300 rounded-4xl p-5 mx-0.5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all text-stone-400 dark:text-stone-400 hover:border-ink dark:hover:border-cream hover:text-ink dark:hover:text-cream"
           aria-label={viewMode === 'country' ? 'Add another country' : 'Add another currency'}
         >
-          <div className="w-14 h-14 rounded-full bg-stone-100 dark:bg-ink flex items-center justify-center group-hover:bg-yolk dark:group-hover:bg-yolk group-hover:text-ink dark:group-hover:text-ink transition-colors">
+          <div className="w-14 h-14 mx-auto rounded-full bg-stone-100 dark:bg-ink flex items-center justify-center group-hover:bg-yolk dark:group-hover:bg-yolk group-hover:text-ink dark:group-hover:text-ink transition-colors">
             <PlusIcon weight="bold" className="text-2xl" />
           </div>
           <div className="text-center">
-            <div className="font-display font-bold">Add Another</div>
+            <div className="font-display font-bold text-md">Add Another</div>
             <p className="text-xs">{viewMode === 'country' ? 'Countries await' : 'Curiosity has no limits'}</p>
           </div>
         </button>
