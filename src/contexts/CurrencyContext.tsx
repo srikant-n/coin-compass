@@ -9,7 +9,7 @@ export interface CurrencyItem {
   symbol: string;
   convertedAmount: number;
   rate: number;
-  isFavorite: boolean;
+  isfavourite: boolean;
 }
 
 interface CurrencyContextType {
@@ -20,8 +20,9 @@ interface CurrencyContextType {
   currencyItems: CurrencyItem[];
   addCurrencyItem: (item: CurrencyItemInput) => void;
   removeCurrencyItem: (id: string) => void;
-  toggleFavorite: (id: string) => void;
+  togglefavourite: (id: string) => void;
   updateCurrencyItem: (id: string, newCode: string, currencyData: any) => Promise<void>;
+  favouriteCurrencies: string[];
 }
 
 export interface CurrencyItemInput {
@@ -30,13 +31,14 @@ export interface CurrencyItemInput {
   symbol: string;
   convertedAmount: number;
   rate: number;
-  isFavorite: boolean;
+  isfavourite: boolean;
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
 const BASE_CURRENCY_KEY = 'baseCurrency';
 const SELECTED_CURRENCIES_KEY = 'selectedCurrencies';
+const favourite_CURRENCIES_KEY = 'favouriteCurrencies';
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [baseCurrency, setBaseCurrency] = useState<string>(() => {
@@ -67,8 +69,17 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
         symbol: currency.symbol,
         convertedAmount: 100,
         rate: 1,
-        isFavorite: false
+        isfavourite: false
       }];
+    } catch {
+      return [];
+    }
+  });
+  const [favouriteCurrencies, setfavouriteCurrencies] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const stored = localStorage.getItem(favourite_CURRENCIES_KEY);
+      return stored ? (JSON.parse(stored) as string[]) : [];
     } catch {
       return [];
     }
@@ -88,6 +99,13 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [currencyItems]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(favourite_CURRENCIES_KEY, JSON.stringify(favouriteCurrencies));
+    } catch {}
+  }, [favouriteCurrencies]);
+
   const addCurrencyItem = (item: CurrencyItemInput) => {
     const newItem: CurrencyItem = {
       ...item,
@@ -100,10 +118,20 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     setCurrencyItems(prev => prev.filter(item => item.id !== id));
   };
 
-  const toggleFavorite = (id: string) => {
+  const togglefavourite = (id: string) => {
+    const item = currencyItems.find(i => i.id === id);
+    const code = item?.code;
+    if (code) {
+      setfavouriteCurrencies(prev => {
+        const set = new Set(prev);
+        if (set.has(code)) set.delete(code);
+        else set.add(code);
+        return Array.from(set);
+      });
+    }
     setCurrencyItems(prev =>
-      prev.map(item =>
-        item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
+      prev.map(i =>
+        i.id === id ? { ...i, isfavourite: !i.isfavourite } : i
       )
     );
   };
@@ -189,8 +217,9 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       currencyItems,
       addCurrencyItem,
       removeCurrencyItem,
-      toggleFavorite,
-      updateCurrencyItem
+      togglefavourite,
+      updateCurrencyItem,
+      favouriteCurrencies
     }}>
       {children}
     </CurrencyContext.Provider>

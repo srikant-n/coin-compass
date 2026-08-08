@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BaseCurrency } from './BaseCurrency';
-import { CurrencyProvider } from '../../contexts/CurrencyContext';
-import { currenciesList, POPULAR_CURRENCIES } from '../../data/currencies';
+import { CurrencyProvider } from '../contexts/CurrencyContext';
+import { currenciesList, POPULAR_CURRENCIES } from '../data/currencies';
 
 describe('BaseCurrency', () => {
   const renderWithProvider = () => {

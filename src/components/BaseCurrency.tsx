@@ -1,15 +1,11 @@
-import { useCurrency } from '../../contexts/CurrencyContext';
-import { currenciesByCode, currenciesList, POPULAR_CURRENCIES } from '../../data/currencies';
+import { useCurrency } from '../contexts/CurrencyContext';
+import { currenciesByCode, currenciesList } from '../data/currencies';
 import { CaretDownIcon } from '@phosphor-icons/react';
+import CurrencySelect from './CurrencySelect';
 
 export function BaseCurrency() {
-  const { baseCurrency, amount, setAmount, setBaseCurrency } = useCurrency();
+  const { baseCurrency, amount, setAmount, setBaseCurrency, favouriteCurrencies } = useCurrency();
   const currency = currenciesByCode[baseCurrency];
-
-  // Split the sorted currency list into popular and remaining currencies
-  const popularSet = new Set(POPULAR_CURRENCIES);
-  const popularCurrencies = currenciesList.filter((c) => popularSet.has(c.iso_code));
-  const otherCurrencies = currenciesList.filter((c) => !popularSet.has(c.iso_code));
 
   return (
     <section id="converter-base" aria-labelledby="base-currency-heading" className="w-full max-w-2xl text-center mb-16 mx-auto">
@@ -31,28 +27,15 @@ export function BaseCurrency() {
 
             {/* Currency Select */}
             <div className="relative">
-              <select
+              <CurrencySelect
                 value={baseCurrency}
                 onChange={(e) => setBaseCurrency(e.target.value)}
-                aria-label="Select base currency"
+                ariaLabel="Select base currency"
+                currencies={currenciesList}
+                showFullLabel
+                favourites={favouriteCurrencies}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 appearance-none bg-cream border border-stone-300 rounded-full px-3 py-1 pr-8 text-[10px] font-bold text-stone-600 hover:border-ink focus:outline-none focus:border-ink"
-              >
-                {/* Grouped by popularity, then alphabetically */}
-                <optgroup label="Popular">
-                  {popularCurrencies.map((curr) => (
-                    <option key={curr.iso_code} value={curr.iso_code}>
-                      {curr.iso_code} - {curr.name} ({curr.symbol})
-                    </option>
-                  ))}
-                </optgroup>
-                <optgroup label="Currencies">
-                  {otherCurrencies.map((curr) => (
-                    <option key={curr.iso_code} value={curr.iso_code}>
-                      {curr.iso_code} - {curr.name} ({curr.symbol})
-                    </option>
-                  ))}
-                </optgroup>
-              </select>
+              />
               <div aria-hidden="true" className="flex items-center gap-2 bg-cream border border-stone-300 rounded-3xl p-2 hover:bg-stone-300/10 transition-colors pointer-events-none">
                 <span className="w-6 h-6 md:w-10 md:h-10 rounded-full bg-ink text-cream flex items-center justify-center font-display font-bold text-md md:text-xl">{currency?.symbol || '$'}</span>
                 <div className="font-black text-md md:text-xl leading-none">{baseCurrency}</div>

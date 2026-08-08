@@ -1,8 +1,8 @@
-import { useCurrency } from '../../contexts/CurrencyContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import CurrencyItem from './CurrencyItem';
-import { currenciesList } from '../../data/currencies';
-import type { CurrencyItemInput } from '../../contexts/CurrencyContext';
-import { getLatestRates } from '../../api/currencyConversion';
+import { currenciesList } from '../data/currencies';
+import type { CurrencyItemInput } from '../contexts/CurrencyContext';
+import { getLatestRates } from '../api/currencyConversion';
 import { PlusIcon } from '@phosphor-icons/react';
 
 export default function ConversionSection() {
@@ -26,7 +26,7 @@ export default function ConversionSection() {
         symbol: availableCurrency.symbol,
         convertedAmount,
         rate,
-        isFavorite: false
+        isfavourite: false
       };
 
       addCurrencyItem(newItem);
@@ -60,7 +60,7 @@ export default function ConversionSection() {
             symbol={item.symbol}
             convertedAmount={item.convertedAmount}
             rate={item.rate}
-            isFavorite={item.isFavorite}
+            isfavourite={item.isfavourite}
           />
         ))}
 

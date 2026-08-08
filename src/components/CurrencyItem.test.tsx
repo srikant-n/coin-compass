@@ -2,17 +2,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CurrencyItem from './CurrencyItem';
-import { POPULAR_CURRENCIES, currenciesList } from '../../data/currencies';
+import { POPULAR_CURRENCIES, currenciesList } from '../data/currencies';
 
 const removeCurrencyItem = vi.fn();
-const toggleFavorite = vi.fn();
+const togglefavourite = vi.fn();
 const updateCurrencyItem = vi.fn();
 
-vi.mock('../../contexts/CurrencyContext', () => ({
+vi.mock('../contexts/CurrencyContext', () => ({
   useCurrency: () => ({
     baseCurrency: 'USD',
+    favouriteCurrencies: [],
     removeCurrencyItem,
-    toggleFavorite,
+    togglefavourite,
     updateCurrencyItem
   })
 }));
@@ -26,13 +27,13 @@ const baseProps = {
   symbol: '$',
   convertedAmount: 150,
   rate: 1.0,
-  isFavorite: false
+  isfavourite: false
 };
 
 describe('CurrencyItem', () => {
   beforeEach(() => {
     removeCurrencyItem.mockClear();
-    toggleFavorite.mockClear();
+    togglefavourite.mockClear();
     updateCurrencyItem.mockClear();
   });
 
@@ -81,12 +82,12 @@ describe('CurrencyItem', () => {
     expect(removeCurrencyItem).toHaveBeenCalledWith(baseProps.id);
   });
 
-  it('calls toggleFavorite when the favorite button is clicked', async () => {
+  it('calls togglefavourite when the favourite button is clicked', async () => {
     const user = userEvent.setup();
     render(<CurrencyItem {...baseProps} />);
 
-    await user.click(screen.getByRole('button', { name: 'Add to favorites' }));
-    expect(toggleFavorite).toHaveBeenCalledWith(baseProps.id);
+    await user.click(screen.getByRole('button', { name: 'Add to favourites' }));
+    expect(togglefavourite).toHaveBeenCalledWith(baseProps.id);
   });
 
   it('calls updateCurrencyItem when the user selects a different currency', async () => {
