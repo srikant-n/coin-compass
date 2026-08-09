@@ -30,6 +30,7 @@ interface CurrencyContextType {
   removeCurrencyItem: (id: string) => void;
   togglefavourite: (id: string) => void;
   updateCurrencyItem: (id: string, newCode: string, currencyData: any, countryName?: string) => Promise<void>;
+  resetCurrentView: () => void;
   favouriteCurrencies: string[];
 }
 
@@ -224,6 +225,16 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     setViewMode(mode);
   };
 
+  const handleResetCurrentView = () => {
+    if (viewMode === 'country') {
+      setCountryBase('United States');
+      setCountryViewItems(defaultCountryTargets('United States'));
+    } else {
+      setCurrencyBase('USD');
+      setCurrencyViewItems(defaultCurrencyTargets('USD'));
+    }
+  };
+
   const addCurrencyItem = (item: CurrencyItemInput) => {
     const newItem: CurrencyItem = {
       ...item,
@@ -395,6 +406,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       removeCurrencyItem,
       togglefavourite,
       updateCurrencyItem,
+      resetCurrentView: handleResetCurrentView,
       favouriteCurrencies
     }}>
       {children}
