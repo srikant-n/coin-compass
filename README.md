@@ -2,12 +2,14 @@
 
 **Coin Compass** is a playful, fast currency converter built with React and Vite. Enter an amount, pick a base currency or country, and instantly see conversions into other currencies. Toggle between **Currency** and **Country** views to explore exchange rates or compare real-world purchasing power.
 
+**Live app:** https://coin-compass-psi.vercel.app/
+
 ## Features
 
-- **Instant conversions** — Live exchange rates from a public, zero-config API.
+- **Instant conversions** — Exchange rates from a public, zero-config API.
 - **Currency view** — Convert into a list of world currencies and add them as you go.
 - **Country view** — See how much your money is worth in another country using Purchasing Power Parity (PPP) estimates.
-- **Dark mode** — Comfortable viewing in light and dark themes.
+- **Dark mode** — Comfortable viewing in light and dark themes, set as per system theme
 - **Responsive design** — Works on desktop and mobile.
 
 ## Tech Stack
