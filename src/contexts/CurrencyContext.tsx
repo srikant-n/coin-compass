@@ -1,7 +1,7 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { getLatestRates } from '../api/currencyConversion';
 import { currenciesByCode } from '../data/currencies';
-import { countriesByName, getDefaultCountryForCurrency } from '../data/countries';
+import { countriesByName, countriesListSorted, getDefaultCountryForCurrency } from '../data/countries';
 
 export interface CurrencyItem {
   id: string;
@@ -49,7 +49,8 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined
 
 const BASE_CURRENCY_KEY = 'baseCurrency';
 const BASE_COUNTRY_KEY = 'baseCountry';
-const SELECTED_CURRENCIES_KEY = 'selectedCurrencies';
+const CURRENCY_TARGETS_KEY = 'selectedCurrencies';
+const COUNTRY_TARGETS_KEY = 'selectedCountries';
 const favourite_CURRENCIES_KEY = 'favouriteCurrencies';
 const VIEW_MODE_KEY = 'viewMode';
 
@@ -66,76 +67,120 @@ function computePPPAmount(
   return amount * (target.ppp / base.ppp);
 }
 
+function loadItem<T>(key: string, fallback: T): T {
+  if (typeof window === 'undefined') return fallback;
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? (JSON.parse(stored) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function loadString(key: string, fallback: string): string {
+  if (typeof window === 'undefined') return fallback;
+  try {
+    return localStorage.getItem(key) || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function defaultCurrencyTargets(baseCurrency: string): CurrencyItem[] {
+  const defaultCode = baseCurrency === 'EUR' ? 'USD' : 'EUR';
+  const currency = currenciesByCode[defaultCode];
+  if (!currency) return [];
+
+  return [{
+    id: `${defaultCode}-default`,
+    code: defaultCode,
+    name: currency.name,
+    symbol: currency.symbol,
+    convertedAmount: 100,
+    rate: 1,
+    isfavourite: false
+  }];
+}
+
+function defaultCountryTargets(baseCountry: string): CurrencyItem[] {
+  const country = countriesListSorted.find(c => c.name !== baseCountry);
+  if (!country) return [];
+  const currency = currenciesByCode[country.currency_code];
+  if (!currency) return [];
+
+  return [{
+    id: `${country.name}-default`,
+    code: currency.iso_code,
+    name: currency.name,
+    symbol: currency.symbol,
+    convertedAmount: 100,
+    rate: 1,
+    isfavourite: false,
+    country: country.name,
+    ppp: country.ppp,
+    pppAmount: computePPPAmount(100, baseCountry, country.name, 'country')
+  }];
+}
+
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [baseCurrency, setBaseCurrency] = useState<string>(() => {
-    if (typeof window === 'undefined') return 'USD';
-    try {
-      const stored = localStorage.getItem(BASE_CURRENCY_KEY);
-      return stored || 'USD';
-    } catch {
-      return 'USD';
-    }
-  });
+  const [currencyBase, setCurrencyBase] = useState<string>(() => loadString(BASE_CURRENCY_KEY, 'USD'));
+  const [countryBase, setCountryBase] = useState<string>(() => loadString(BASE_COUNTRY_KEY, 'United States'));
   const [viewMode, setViewMode] = useState<'currency' | 'country'>(() => {
-    if (typeof window === 'undefined') return 'currency';
-    try {
-      const stored = localStorage.getItem(VIEW_MODE_KEY);
-      return stored === 'country' ? 'country' : 'currency';
-    } catch {
-      return 'currency';
-    }
-  });
-  const [baseCountry, setBaseCountry] = useState<string>(() => {
-    if (typeof window === 'undefined') return 'United States';
-    try {
-      const storedCurrency = localStorage.getItem(BASE_CURRENCY_KEY) || 'USD';
-      const storedCountry = localStorage.getItem(BASE_COUNTRY_KEY);
-      return getDefaultCountryForCurrency(storedCurrency, storedCountry || undefined);
-    } catch {
-      return 'United States';
-    }
+    const stored = loadString(VIEW_MODE_KEY, 'currency');
+    return stored === 'country' ? 'country' : 'currency';
   });
   const [amount, setAmount] = useState<number>(100);
-  const [currencyItems, setCurrencyItems] = useState<CurrencyItem[]>(() => {
-    if (typeof window === 'undefined') return [];
-    try {
-      const stored = localStorage.getItem(SELECTED_CURRENCIES_KEY);
-      if (stored) return JSON.parse(stored) as CurrencyItem[];
-
-      const storedBase = localStorage.getItem(BASE_CURRENCY_KEY) || 'USD';
-      const defaultCode = storedBase === 'EUR' ? 'USD' : 'EUR';
-      const currency = currenciesByCode[defaultCode];
-      if (!currency) return [];
-
-      return [{
-        id: `${defaultCode}-default`,
-        code: defaultCode,
-        name: currency.name,
-        symbol: currency.symbol,
-        convertedAmount: 100,
-        rate: 1,
-        isfavourite: false
-      }];
-    } catch {
-      return [];
-    }
+  const [currencyViewItems, setCurrencyViewItems] = useState<CurrencyItem[]>(() =>
+    loadItem<CurrencyItem[]>(CURRENCY_TARGETS_KEY, defaultCurrencyTargets(loadString(BASE_CURRENCY_KEY, 'USD')))
+  );
+  const [countryViewItems, setCountryViewItems] = useState<CurrencyItem[]>(() => {
+    const stored = loadItem<CurrencyItem[] | null>(COUNTRY_TARGETS_KEY, null);
+    if (stored) return stored;
+    return defaultCountryTargets(loadString(BASE_COUNTRY_KEY, 'United States'));
   });
-  const [favouriteCurrencies, setfavouriteCurrencies] = useState<string[]>(() => {
-    if (typeof window === 'undefined') return [];
-    try {
-      const stored = localStorage.getItem(favourite_CURRENCIES_KEY);
-      return stored ? (JSON.parse(stored) as string[]) : [];
-    } catch {
-      return [];
+  const [favouriteCurrencies, setfavouriteCurrencies] = useState<string[]>(() =>
+    loadItem<string[]>(favourite_CURRENCIES_KEY, [])
+  );
+
+  const baseCurrency = useMemo(() => {
+    if (viewMode === 'country') {
+      return countriesByName[countryBase]?.currency_code || 'USD';
     }
-  });
+    return currencyBase;
+  }, [viewMode, currencyBase, countryBase]);
+
+  const baseCountry = useMemo(() => {
+    if (viewMode === 'country') {
+      return countryBase;
+    }
+    return getDefaultCountryForCurrency(currencyBase);
+  }, [viewMode, countryBase, currencyBase]);
+
+  const currencyItems = useMemo(() => {
+    return viewMode === 'country' ? countryViewItems : currencyViewItems;
+  }, [viewMode, currencyViewItems, countryViewItems]);
+
+  const amountRef = useRef(amount);
+  const baseCountryRef = useRef(baseCountry);
+  const viewModeRef = useRef(viewMode);
+
+  useEffect(() => { amountRef.current = amount; }, [amount]);
+  useEffect(() => { baseCountryRef.current = baseCountry; }, [baseCountry]);
+  useEffect(() => { viewModeRef.current = viewMode; }, [viewMode]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
-      localStorage.setItem(BASE_CURRENCY_KEY, baseCurrency);
+      localStorage.setItem(BASE_CURRENCY_KEY, currencyBase);
     } catch {}
-  }, [baseCurrency]);
+  }, [currencyBase]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(BASE_COUNTRY_KEY, countryBase);
+    } catch {}
+  }, [countryBase]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -147,16 +192,16 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
-      localStorage.setItem(BASE_COUNTRY_KEY, baseCountry);
+      localStorage.setItem(CURRENCY_TARGETS_KEY, JSON.stringify(currencyViewItems));
     } catch {}
-  }, [baseCountry]);
+  }, [currencyViewItems]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
-      localStorage.setItem(SELECTED_CURRENCIES_KEY, JSON.stringify(currencyItems));
+      localStorage.setItem(COUNTRY_TARGETS_KEY, JSON.stringify(countryViewItems));
     } catch {}
-  }, [currencyItems]);
+  }, [countryViewItems]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -165,20 +210,17 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [favouriteCurrencies]);
 
+  const handleSetBaseCurrency = (currencyCode: string) => {
+    setCurrencyBase(currencyCode);
+  };
+
   const handleSetBaseCountry = (countryName: string) => {
     const country = countriesByName[countryName];
     if (!country) return;
-    setBaseCountry(countryName);
-    setBaseCurrency(country.currency_code);
+    setCountryBase(countryName);
   };
 
   const handleSetViewMode = (mode: 'currency' | 'country') => {
-    if (mode === 'country') {
-      const current = countriesByName[baseCountry];
-      if (!current || current.currency_code !== baseCurrency) {
-        setBaseCountry(getDefaultCountryForCurrency(baseCurrency, baseCountry));
-      }
-    }
     setViewMode(mode);
   };
 
@@ -187,15 +229,24 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       ...item,
       id: `${item.country || item.code}-${Date.now()}`,
     };
-    setCurrencyItems(prev => [...prev, newItem]);
+    if (viewMode === 'country') {
+      setCountryViewItems(prev => [...prev, newItem]);
+    } else {
+      setCurrencyViewItems(prev => [...prev, newItem]);
+    }
   };
 
   const removeCurrencyItem = (id: string) => {
-    setCurrencyItems(prev => prev.filter(item => item.id !== id));
+    if (viewMode === 'country') {
+      setCountryViewItems(prev => prev.filter(item => item.id !== id));
+    } else {
+      setCurrencyViewItems(prev => prev.filter(item => item.id !== id));
+    }
   };
 
   const togglefavourite = (id: string) => {
-    const item = currencyItems.find(i => i.id === id);
+    const activeList = viewMode === 'country' ? countryViewItems : currencyViewItems;
+    const item = activeList.find(i => i.id === id);
     const code = item?.code;
     if (code) {
       setfavouriteCurrencies(prev => {
@@ -205,11 +256,15 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
         return Array.from(set);
       });
     }
-    setCurrencyItems(prev =>
+    const updater = (prev: CurrencyItem[]) =>
       prev.map(i =>
         i.id === id ? { ...i, isfavourite: !i.isfavourite } : i
-      )
-    );
+      );
+    if (viewMode === 'country') {
+      setCountryViewItems(updater);
+    } else {
+      setCurrencyViewItems(updater);
+    }
   };
 
   const updateCurrencyItem = async (id: string, newCode: string, currencyData: any, countryName?: string) => {
@@ -220,11 +275,13 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     try {
       const response = await getLatestRates(baseCurrency);
       const rate = response.rates[newCode] ?? 1.0;
-      const convertedAmount = amount * rate;
+      const convertedAmount = amountRef.current * rate;
       const ppp = country ? country.ppp : undefined;
-      const pppAmount = country ? computePPPAmount(amount, baseCountry, country.name, viewMode) : null;
+      const pppAmount = country
+        ? computePPPAmount(amountRef.current, baseCountryRef.current, country.name, viewModeRef.current)
+        : null;
 
-      setCurrencyItems(prev =>
+      const updater = (prev: CurrencyItem[]) =>
         prev.map(item =>
           item.id === id
             ? {
@@ -239,12 +296,17 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
                 pppAmount
               }
             : item
-        )
-      );
+        );
+
+      if (viewModeRef.current === 'country') {
+        setCountryViewItems(updater);
+      } else {
+        setCurrencyViewItems(updater);
+      }
     } catch (error) {
       console.error('Failed to fetch exchange rate:', error);
 
-      setCurrencyItems(prev =>
+      const updater = (prev: CurrencyItem[]) =>
         prev.map(item =>
           item.id === id
             ? {
@@ -256,27 +318,43 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
                 ppp: country ? country.ppp : undefined
               }
             : item
-        )
-      );
+        );
+
+      if (viewModeRef.current === 'country') {
+        setCountryViewItems(updater);
+      } else {
+        setCurrencyViewItems(updater);
+      }
     }
   };
 
   useEffect(() => {
     const updateAllRates = async () => {
-      if (currencyItems.length === 0) return;
+      const currentView = viewModeRef.current;
+      const currentAmount = amountRef.current;
+      const currentBaseCountry = baseCountryRef.current;
+
       try {
         const response = await getLatestRates(baseCurrency);
-        setCurrencyItems(prev =>
-          prev.map(item => {
+
+        const updater = (prev: CurrencyItem[]) => {
+          if (prev.length === 0) return prev;
+          return prev.map(item => {
             const rate = response.rates[item.code] ?? 1.0;
             return {
               ...item,
               rate,
-              convertedAmount: amount * rate,
-              pppAmount: computePPPAmount(amount, baseCountry, item.country, viewMode)
+              convertedAmount: currentAmount * rate,
+              pppAmount: computePPPAmount(currentAmount, currentBaseCountry, item.country, currentView)
             };
-          })
-        );
+          });
+        };
+
+        if (currentView === 'country') {
+          setCountryViewItems(updater);
+        } else {
+          setCurrencyViewItems(updater);
+        }
       } catch (error) {
         console.error('Failed to update rates for base currency change:', error);
       }
@@ -286,24 +364,31 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   }, [baseCurrency]);
 
   useEffect(() => {
-    setCurrencyItems(prev =>
+    const isCountry = viewMode === 'country';
+
+    const updater = (prev: CurrencyItem[]) =>
       prev.map(item => ({
         ...item,
         convertedAmount: amount * item.rate,
         pppAmount: computePPPAmount(amount, baseCountry, item.country, viewMode)
-      }))
-    );
+      }));
+
+    if (isCountry) {
+      setCountryViewItems(updater);
+    } else {
+      setCurrencyViewItems(updater);
+    }
   }, [amount, baseCountry, viewMode]);
 
   return (
-    <CurrencyContext.Provider value={{ 
-      viewMode, 
+    <CurrencyContext.Provider value={{
+      viewMode,
       setViewMode: handleSetViewMode,
-      baseCurrency, 
-      setBaseCurrency, 
+      baseCurrency,
+      setBaseCurrency: handleSetBaseCurrency,
       baseCountry,
       setBaseCountry: handleSetBaseCountry,
-      amount, 
+      amount,
       setAmount,
       currencyItems,
       addCurrencyItem,
