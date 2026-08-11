@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useCurrency } from '../contexts/CurrencyContext';
 import CurrencyItem from './CurrencyItem';
 import { currenciesList, currenciesByCode } from '../data/currencies';
@@ -8,6 +9,7 @@ import { PlusIcon } from '@phosphor-icons/react';
 
 export default function ConversionSection() {
   const { viewMode, baseCountry, currencyItems, addCurrencyItem, baseCurrency, amount } = useCurrency();
+  const [scrollToId, setScrollToId] = useState<string | null>(null);
 
   const handleAdd = async () => {
     if (viewMode === 'country') {
@@ -44,7 +46,8 @@ export default function ConversionSection() {
           pppAmount
         };
 
-        addCurrencyItem(newItem);
+        const id = addCurrencyItem(newItem);
+        setScrollToId(id);
       } catch (error) {
         console.error('Failed to fetch exchange rate:', error);
       }
@@ -72,15 +75,25 @@ export default function ConversionSection() {
         isfavourite: false
       };
 
-      addCurrencyItem(newItem);
+      const id = addCurrencyItem(newItem);
+      setScrollToId(id);
     } catch (error) {
       console.error('Failed to fetch exchange rate:', error);
     }
   };
 
+  useEffect(() => {
+    if (!scrollToId) return;
+    const element = document.getElementById(scrollToId);
+    if (element && typeof element.scrollIntoView === 'function') {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    setScrollToId(null);
+  }, [scrollToId]);
+
   return (
     <section id="conversions-grid" className="w-full max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8 px-1">
         <h2 className="font-display font-extrabold text-2xl tracking-tight dark:text-cream">Around the world, that's...</h2>
         <div className="flex gap-2">
           <button
@@ -95,19 +108,20 @@ export default function ConversionSection() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {currencyItems.map(item => (
-          <CurrencyItem
-            key={item.id}
-            id={item.id}
-            code={item.code}
-            name={item.name}
-            symbol={item.symbol}
-            convertedAmount={item.convertedAmount}
-            rate={item.rate}
-            isfavourite={item.isfavourite}
-            country={item.country}
-            ppp={item.ppp}
-            pppAmount={item.pppAmount}
-          />
+          <div key={item.id} id={item.id}>
+            <CurrencyItem
+              id={item.id}
+              code={item.code}
+              name={item.name}
+              symbol={item.symbol}
+              convertedAmount={item.convertedAmount}
+              rate={item.rate}
+              isfavourite={item.isfavourite}
+              country={item.country}
+              ppp={item.ppp}
+              pppAmount={item.pppAmount}
+            />
+          </div>
         ))}
 
         {/* Add New Card */}

@@ -26,7 +26,7 @@ interface CurrencyContextType {
   amount: number;
   setAmount: (amount: number) => void;
   currencyItems: CurrencyItem[];
-  addCurrencyItem: (item: CurrencyItemInput) => void;
+  addCurrencyItem: (item: CurrencyItemInput) => string;
   removeCurrencyItem: (id: string) => void;
   togglefavourite: (id: string) => void;
   updateCurrencyItem: (id: string, newCode: string, currencyData: any, countryName?: string) => Promise<void>;
@@ -245,6 +245,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     } else {
       setCurrencyViewItems(prev => [...prev, newItem]);
     }
+    return newItem.id;
   };
 
   const removeCurrencyItem = (id: string) => {
